@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import json
 import os
+import subprocess
 
 app = FastAPI()
 @app.get("/")
@@ -39,6 +40,8 @@ async def landmarks(request: Request):
     # Example: Store the landmark data in a database
 
     write_coordinates(data,os.path.join(os.getcwd(),'coordinates.json'))
+    pred_path = os.path.join(os.getcwd(),'Model','data_prediction_updated.py')
+    subprocess.run(["python", pred_path, json.dumps(data)])
 
     return JSONResponse(content={"message": "Landmarks processed successfully"})
 
