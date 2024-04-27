@@ -2,6 +2,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+import json
+import os
 
 app = FastAPI()
 @app.get("/")
@@ -36,7 +38,20 @@ async def landmarks(request: Request):
     # Implement your logic for processing the landmark data
     # Example: Store the landmark data in a database
 
+    write_coordinates(data,os.path.join(os.getcwd(),'coordinates.json'))
+
     return JSONResponse(content={"message": "Landmarks processed successfully"})
+
+@app.post("/get_output")
+async def process_name(request: Request):
+    data = await request.json()
+    print("Received data:", data)
+    
+    return JSONResponse(content={"message": "Received response"})
+
+def write_coordinates(coordinates, file_path):
+    with open(file_path, 'w') as file:
+        json.dump(coordinates, file)
 
 if __name__=="__main__":
     uvicorn.run(app)

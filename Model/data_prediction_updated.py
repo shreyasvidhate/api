@@ -8,9 +8,37 @@ import math
 import json
 from datetime import datetime
 import time
+import requests
 from keras.models import load_model
 from sklearn.metrics import confusion_matrix
 from amendment import amendment_suggestion
+
+coordinates_file_path = os.path.join(os.getcwd(),"coordinates.json")
+
+def read_coordinates(file_path):
+    with open(file_path, 'r') as file:
+        coordinates = json.load(file)
+    return coordinates
+
+def monitor_coordinates():
+    while True:
+        if os.path.exists(coordinates_file_path):
+            coordinates = read_coordinates(coordinates_file_path)
+            print(coordinates)
+        else:
+            print("Coordinates file not found.")
+        time.sleep(5)
+    return coordinates
+
+def send_output(output):
+    url = 'https://api-mlkit.onrender.com/get_output'
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(url, headers=headers, json=output)
+    if response.status_code == 200:
+        print("Output sent successfully:", output)
+    else:
+        print("Failed to send output:", response.text)
+
 
 def inFrame(lst):
 	if lst[28].visibility > 0.6 and lst[27].visibility > 0.6 and lst[15].visibility>0.6 and lst[16].visibility>0.6:
@@ -181,4 +209,13 @@ def predict():
                 cap.release()
                 break
 
-predict()
+def main():
+    coordinates = monitor_coordinates()
+    send_output("from ml")
+
+if __name__ == "__main__":
+    main()
+    
+
+# predict()
+# monitor_coordinates()
