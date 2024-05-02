@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import json
 import os
 import subprocess
+import requests
 
 app = FastAPI()
 @app.get("/")
@@ -36,12 +37,17 @@ async def landmarks(request: Request):
     left_shoulder_y = data.get("leftShoulderY", 0.0)
     left_shoulder_z = data.get("leftShoulderZ", 0.0)
 
-    # Implement your logic for processing the landmark data
-    # Example: Store the landmark data in a database
+    try:
+        response = requests.post('https://api-mlkit.onrender.com/landmarks', json=data)
+        response.raise_for_status()  # Raise exception for non-2xx status codes
+        return JSONResponse(content={"message": "Landmarks processed successfully"})
+    except requests.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send data to prediction script: {str(e)}")
 
-    write_coordinates(data,os.path.join(os.getcwd(),'coordinates.json'))
-    pred_path = os.path.join(os.getcwd(),'Model','data_prediction_updated.py')
-    subprocess.run(["python", pred_path, json.dumps(data)])
+
+    # write_coordinates(data,os.path.join(os.getcwd(),'coordinates.json'))
+    # pred_path = os.path.join(os.getcwd(),'Model','data_prediction_updated.py')
+    # subprocess.run(["python", pred_path, json.dumps(data)])
 
     return JSONResponse(content={"message": "Landmarks processed successfully"})
 

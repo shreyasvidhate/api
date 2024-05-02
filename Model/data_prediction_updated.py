@@ -13,6 +13,23 @@ import socket
 from keras.models import load_model
 from sklearn.metrics import confusion_matrix
 from amendment import amendment_suggestion
+from fastapi import FastAPI, Request
+import json
+
+app = FastAPI()
+
+@app.post("/predict")
+async def predict(request: Request):
+    data = await request.json()
+
+    # Process the received coordinates
+    print("Received coordinates for prediction:")
+    print(data,"from prediction")
+
+    # Implement your prediction logic here
+    
+    # Return prediction result (if any) as needed
+    return {"message": "Prediction completed"}
 
 coordinates_file_path = os.path.join(os.getcwd(),"coordinates.json")
 
