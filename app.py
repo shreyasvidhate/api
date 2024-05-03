@@ -7,6 +7,8 @@ import os
 import subprocess
 import requests
 
+from Model.data_prediction_updated import receive_landmarks
+
 app = FastAPI()
 @app.get("/")
 def index():
@@ -38,8 +40,12 @@ async def landmarks(request: Request):
     left_shoulder_z = data.get("leftShoulderZ", 0.0)
 
     try:
-        response = requests.post('https://api-mlkit.onrender.com/landmarks', json=data)
-        response.raise_for_status()  # Raise exception for non-2xx status codes
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post('https://api-mlkit.onrender.com/landmarks',headers=headers, json=data)
+        print("before status")
+        response.raise_for_status()
+        print("after status")
+        receive_landmarks()
         return JSONResponse(content={"message": "Landmarks processed successfully"})
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=f"Failed to send data to prediction script: {str(e)}")
