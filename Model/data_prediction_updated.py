@@ -12,7 +12,7 @@ import requests
 import socket
 from keras.models import load_model
 from sklearn.metrics import confusion_matrix
-from amendment import amendment_suggestion
+from Model.amendment import amendment_suggestion
 from fastapi import FastAPI, Request
 import json
 
